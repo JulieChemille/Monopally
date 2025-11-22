@@ -1081,6 +1081,15 @@
                 // Utiliser textContent pour les messages sans image (plus sûr)
                 document.getElementById('modalMessage').textContent = message.message;
             }
+            if (message.imageUrl) {
+                let maxWidth = '300px'; // Taille par défaut
+                
+                // ICI tu peux changer les tailles ↓
+                if (property === 'depart') {
+                    maxWidth = '150px'; // Plus petit pour départ
+                } else if (property === 'adagio') {
+                    maxWidth = '250px'; // Taille moyenne
+                }
             
             document.getElementById('modalAuthor').textContent = '- ' + message.author;
             
