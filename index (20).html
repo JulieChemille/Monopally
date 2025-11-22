@@ -1066,30 +1066,34 @@
             }
         }
 
+
+
         function showMessage(property, fromRandom = false) {
             const message = messages[property];
             if (!message) return;
             
             document.getElementById('modalTitle').textContent = message.title;
             
-            // Vérifier si il y a une image
-            if (message.imageUrl) {
-                // Utiliser innerHTML seulement si il y a une image
-                let imageHtml = '<img src="' + message.imageUrl + '" style="width: 100%; max-width: 300px; border-radius: 10px; margin-bottom: 15px;"><br>';
-                document.getElementById('modalMessage').innerHTML = imageHtml + message.message;
-            } else {
-                // Utiliser textContent pour les messages sans image (plus sûr)
-                document.getElementById('modalMessage').textContent = message.message;
+    // Vérifier si il y a une image
+        if (message.imageUrl) {
+            // D'ABORD définir la taille
+            let maxWidth = '300px'; // Taille par défaut
+            
+            if (property === 'depart') {
+                maxWidth = '150px'; // Plus petit pour départ
+            } else if (property === 'adagio') {
+                maxWidth = '250px'; // Taille moyenne
             }
-            if (message.imageUrl) {
-                let maxWidth = '300px'; // Taille par défaut
-                
-                // ICI tu peux changer les tailles ↓
-                if (property === 'depart') {
-                    maxWidth = '150px'; // Plus petit pour départ
-                } else if (property === 'adagio') {
-                    maxWidth = '250px'; // Taille moyenne
-                }
+            
+            // ENSUITE créer l'image avec la bonne taille
+            let imageHtml = '<img src="' + message.imageUrl + 
+                '" style="width: 100%; max-width: ' + maxWidth + // ← Utilise maxWidth ICI
+                '; border-radius: 10px; margin-bottom: 15px;"><br>';
+            document.getElementById('modalMessage').innerHTML = imageHtml + message.message;
+        } else {
+            // Utiliser textContent pour les messages sans image
+            document.getElementById('modalMessage').textContent = message.message;
+        }
             
             document.getElementById('modalAuthor').textContent = '- ' + message.author;
             
