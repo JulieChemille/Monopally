@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <!-- 
+        MonopALLy - Edition Spéciale 10 Ans
+        
+        Features développées :
+        - 20 cases interactives avec messages cachés
+        - Quiz avec questions personnalisées et choix multiples
+        - Système de progression
+        - Bouton reset pour recommencer
+        - Animations et confettis à la fin
+        - Design aux couleurs Accor ALL (bleu #14143A et doré #E4CBA5)
+        
+        Fait avec HTML, CSS et JavaScript vanilla - pas de framework nécessaire !
+    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MonopALLy - 10 Ans Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #14143A;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            background: white;
+            padding: 20px 50px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .header h1 {
+            font-family: 'Montserrat', sans-serif;
+            color: #14143A;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .header h1 .gold {
+            color: #E4CBA5;
+            text-shadow: 
+                -1px -1px 0 #14143A,
+                1px -1px 0 #14143A,
+                -1px 1px 0 #14143A,
+                1px 1px 0 #14143A;
+        }
+
+        .board-container {
+            background: #1a1a4a;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        .board {
+            width: 500px;
+            height: 500px;
+            background: #E4CBA5;
+            position: relative;
+            display: grid;
+            grid-template-columns: 90px repeat(4, 80px) 90px;
+            grid-template-rows: 90px repeat(4, 80px) 90px;
+            border: 2px solid #14143A;
+        }
+
+        .center {
+            grid-column: 2 / 6;
+            grid-row: 2 / 6;
+            background: #14143A;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border: 2px solid #E4CBA5;
+        }
+
+        .center h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.5rem;
+            margin-bottom: 5px;
+            font-weight: 700;
+            color: #E4CBA5;
+        }
+
+        .center p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            line-height: 1.3;
+            color: #E4CBA5;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .center button {
+            background: #E4CBA5;
+            color: #14143A;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .center button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(228, 203, 165, 0.3);
+        }
+
+        .property {
+            background: white;
+            border: 1px solid #2c3e50;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .property:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            z-index: 10;
+            position: relative;
+        }
+
+        .property.clicked {
+            background: #f1c40f;
+        }
+
+        .property.quiz::after {
+            content: '❓';
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            font-size: 0.8rem;
+            color: #e74c3c;
+        }
+
+        .property.has-image {
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+        }
+
+        .property.has-image .hotel-name,
+        .property.has-image .hotel-location {
+            background: rgba(255,255,255,0.9);
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .color-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 20px;
+        }
+
+        .hotel-name {
+            font-weight: bold;
+            font-size: 0.75rem;
+            color: #2c3e50;
+            margin-top: 22px;
+            line-height: 1;
+        }
+
+        .hotel-location {
+            font-size: 0.6rem;
+            color: #7f8c8d;
+            margin-top: 2px;
+        }
+
+        /* Coins */
+        .corner {
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .corner .icon {
+            font-size: 2rem;
+            margin: 5px 0;
+        }
+
+        .go {
+            grid-column: 1;
+            grid-row: 1;
+            background: #E4CBA5;
+            color: #14143A;
+            font-weight: bold;
+        }
+
+        .jail {
+            grid-column: 1;
+            grid-row: 6;
+            background: #e67e22;
+            color: white;
+        }
+
+        .parking {
+            grid-column: 6;
+            grid-row: 6;
+            background: #3498db;
+            color: white;
+        }
+
+        .gare-rennes {
+            grid-column: 6;
+            grid-row: 1;
+            background: #34495e;
+            color: white;
+        }
+
+        /* Cases du bas - Row 6 */
+        .bottom1 { grid-column: 5; grid-row: 6; }
+        .bottom2 { grid-column: 4; grid-row: 6; }
+        .bottom3 { grid-column: 3; grid-row: 6; }
+        .bottom4 { grid-column: 2; grid-row: 6; }
+
+        /* Cases de gauche - Column 1 */
+        .left1 { grid-column: 1; grid-row: 5; }
+        .left2 { grid-column: 1; grid-row: 4; }
+        .left3 { grid-column: 1; grid-row: 3; }
+        .left4 { grid-column: 1; grid-row: 2; }
+
+        /* Cases du haut - Row 1 */
+        .top1 { grid-column: 2; grid-row: 1; }
+        .top2 { grid-column: 3; grid-row: 1; }
+        .top3 { grid-column: 4; grid-row: 1; }
+        .top4 { grid-column: 5; grid-row: 1; }
+
+        /* Cases de droite - Column 6 */
+        .right1 { grid-column: 6; grid-row: 2; }
+        .right2 { grid-column: 6; grid-row: 3; }
+        .right3 { grid-column: 6; grid-row: 4; }
+        .right4 { grid-column: 6; grid-row: 5; }
+
+        /* Modal pour messages */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            animation: slideIn 0.3s;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal h3 {
+            color: #e74c3c;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .modal p {
+            color: #34495e;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            white-space: pre-line;
+        }
+
+        .modal-author {
+            font-style: italic;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            border-top: 1px solid #ecf0f1;
+            padding-top: 15px;
+        }
+
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            color: #bdc3c7;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #34495e;
+        }
+
+        /* Modal pour questions */
+        .quiz-modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+        }
+
+        .quiz-content {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin: 15% auto;
+            padding: 35px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            animation: bounceIn 0.5s;
+            color: white;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .quiz-content h3 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .quiz-content p {
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        .quiz-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 25px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .quiz-button {
+            background: white;
+            color: #764ba2;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+            margin: 0 5px;
+        }
+
+        .quiz-button:hover {
+            transform: scale(1.05);
+        }
+
+        .quiz-button.solution {
+            background: #f39c12;
+            color: white;
+        }
+
+        .choice-button {
+            background: white;
+            color: #764ba2;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+            margin: 10px;
+            display: block;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .choice-button:hover {
+            transform: scale(1.05);
+            background: #f8f8f8;
+        }
+
+        .quiz-hint {
+            font-size: 0.9rem;
+            margin-top: 15px;
+            opacity: 0.9;
+        }
+
+        .solution-display {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .wrong-answer {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .progress-section {
+            margin-top: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .progress-title {
+            font-size: 0.8rem;
+            color: #95a5a6;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .progress-count {
+            color: #14143A;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #E4CBA5, #d4b995);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(228, 203, 165, 0.3);
+        }
+
+        .achievement {
+            display: none;
+            margin-top: 12px;
+            padding: 12px;
+            background: linear-gradient(90deg, #E4CBA5, #d4b995);
+            color: #14143A;
+            border-radius: 8px;
+            animation: pop 0.5s;
+            text-align: center;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .achievement.show {
+            display: block;
+        }
+
+        /* Bouton Reset */
+        @media (max-width: 550px) {
+            .board {
+                width: 350px;
+                height: 350px;
+                grid-template-columns: 65px repeat(4, 55px) 65px;
+                grid-template-rows: 65px repeat(4, 55px) 65px;
+            }
+            
+            .center h2 {
+                font-size: 2.5rem;
+            }
+            
+            .center p {
+                font-size: 0.9rem;
+            }
+            
+            .property {
+                font-size: 0.5rem;
+            }
+            
+            .hotel-name {
+                font-size: 0.65rem;
+            }
+            
+            .corner .icon {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Monop<span class="gold">ALL</span>y</h1>
+    </div>
+
+    <div class="board-container">
+        <div class="board">
+            <!-- Centre du plateau -->
+            <div class="center">
+                <h2>10 ANS</h2>
+                <p>de bons et<br>LOYAUX services</p>
+                <button onclick="randomMessage()">🎲 Message Surprise</button>
+            </div>
+
+            <!-- Coins -->
+            <div class="property corner go" onclick="showMessage('depart')">
+                <div>DÉPART</div>
+                <div class="icon">→</div>
+                <div>10 ANS!</div>
+            </div>
+            <div class="property corner gare-rennes quiz" onclick="showChoiceQuiz('gare')">
+                <div>GARE</div>
+                <div class="icon">🚂</div>
+                <div>RENNES</div>
+            </div>
+            <div class="property corner parking" onclick="showMessage('kouloungoula')">
+                <div>KOULOUN</div>
+                <div class="icon">👽</div>
+                <div>GOULA</div>
+            </div>
+            <div class="property corner jail" onclick="showMessage('pause')">
+                <div>PAUSE</div>
+                <div class="icon">☕</div>
+                <div>CAFÉ</div>
+            </div>
+
+            <!-- Cases du bas (4) - 2 marrons, 2 bleus -->
+            <div class="property bottom1" onclick="showMessage('ibis')">
+                <div class="color-bar" style="background: #8B4513;"></div>
+                <div class="hotel-name">Ibis Fès</div>
+                <div class="hotel-location">Maroc</div>
+            </div>
+            <div class="property bottom2" onclick="showMessage('novotel')">
+                <div class="color-bar" style="background: #8B4513;"></div>
+                <div class="hotel-name">Novotel</div>
+                <div class="hotel-location">Global</div>
+            </div>
+            <div class="property bottom3" onclick="showMessage('mercure')">
+                <div class="color-bar" style="background: #87CEEB;"></div>
+                <div class="hotel-name">Pullman</div>
+                <div class="hotel-location">Tokyo</div>
+            </div>
+            <div class="property bottom4" onclick="showMessage('pullman')">
+                <div class="color-bar" style="background: #87CEEB;"></div>
+                <div class="hotel-name">Mercure</div>
+                <div class="hotel-location">Porte d'Orléans</div>
+            </div>
+
+            <!-- Cases de gauche (4) -->
+            <div class="property left1" onclick="showMessage('sofitel')">
+                <div class="color-bar" style="background: #FF69B4;"></div>
+                <div class="hotel-name">Novotel</div>
+                <div class="hotel-location">Arcueil</div>
+            </div>
+            <div class="property left2" onclick="showMessage('mgallery')">
+                <div class="color-bar" style="background: #FF69B4;"></div>
+                <div class="hotel-name">MGallery</div>
+                <div class="hotel-location">Collection</div>
+            </div>
+            <div class="property left3" onclick="showMessage('aiglenoir')">
+                <div class="color-bar" style="background: #FFA500;"></div>
+                <div class="hotel-name">Aigle Noir</div>
+                <div class="hotel-location">Fontainebleau</div>
+            </div>
+            <div class="property left4" onclick="showMessage('mama')">
+                <div class="color-bar" style="background: #FFA500;"></div>
+                <div class="hotel-name">Mama Shelter</div>
+                <div class="hotel-location">Lifestyle</div>
+            </div>
+
+            <!-- Cases du haut (4) -->
+            <div class="property top1" onclick="showMessage('adagio')">
+                <div class="color-bar" style="background: #DC143C;"></div>
+                <div class="hotel-name">Adagio</div>
+                <div class="hotel-location">3 ans</div>
+            </div>
+            <div class="property top2" onclick="showMessage('orient')">
+                <div class="color-bar" style="background: #DC143C;"></div>
+                <div class="hotel-name">Orient Express</div>
+                <div class="hotel-location">Legend</div>
+            </div>
+            <div class="property top3" onclick="showMessage('joe')">
+                <div class="color-bar" style="background: #FFFF00;"></div>
+                <div class="hotel-name">JO&JOE</div>
+                <div class="hotel-location">Gentilly</div>
+            </div>
+            <div class="property top4" onclick="showMessage('ibisbudget')">
+                <div class="color-bar" style="background: #FFFF00;"></div>
+                <div class="hotel-name">Ibis Budget</div>
+                <div class="hotel-location">chambre de 9m2</div>
+            </div>
+
+            <!-- Cases de droite (4) -->
+            <div class="property right1" onclick="showMessage('raffles')">
+                <div class="color-bar" style="background: #008000;"></div>
+                <div class="hotel-name">Raffles</div>
+                <div class="hotel-location">Warsaw</div>
+            </div>
+            <div class="property right2" onclick="showMessage('mayakoba')">
+                <div class="color-bar" style="background: #008000;"></div>
+                <div class="hotel-name">Fairmont</div>
+                <div class="hotel-location">MayaKoba</div>
+            </div>
+            <div class="property right3" onclick="showMessage('fairmont')">
+                <div class="color-bar" style="background: #00008B;"></div>
+                <div class="hotel-name">Fairmont</div>
+                <div class="hotel-location">Monaco</div>
+            </div>
+            <div class="property right4" onclick="showMessage('swissotel')">
+                <div class="color-bar" style="background: #00008B;"></div>
+                <div class="hotel-name">Fairmont Royal York</div>
+                <div class="hotel-location">Toronto</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="progress-section">
+        <div class="progress-title">
+            <span>Découverte</span>
+            <span class="progress-count" id="progressText">0/20</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+        <div class="achievement" id="achievement">
+            🎊 Ouhou, tu as réussi à lire toutes les cases sans t'endormir ! 🎊
+        </div>
+    </div>
+
+
+    <!-- Modal pour messages -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3 id="modalTitle">Titre</h3>
+            <p id="modalMessage">Message</p>
+            <div id="modalAuthor" class="modal-author">- Auteur</div>
+        </div>
+    </div>
+
+    <!-- Modal pour questions -->
+    <div id="quizModal" class="quiz-modal">
+        <div class="quiz-content" id="quizContent">
+            <h3>❓ Question Surprise</h3>
+            <p id="quizQuestion">Question</p>
+            <input type="text" id="quizInput" class="quiz-input" placeholder="Votre réponse..." style="display: none;">
+            <div id="choiceButtons" style="display: none;"></div>
+            <div id="normalButtons">
+                <button class="quiz-button" onclick="checkAnswer()">Valider</button>
+                <button class="quiz-button solution" onclick="showSolution()">Solution</button>
+                <button class="quiz-button" onclick="closeQuiz()">Annuler</button>
+            </div>
+            <div class="quiz-hint" id="quizHint" style="display: none;">💡 Indice : </div>
+            <div class="solution-display" id="solutionDisplay" style="display: none;">✅ Réponse : </div>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // CONFIGURATION DES MESSAGES
+        // ========================================
+        
+       const messages = {
+         depart: {
+        title: "🎊 Joyeux 10 ans ! 🎊",
+        message: "<span style='font-size: 0.85em;'>Une décennie à parler hôtels… ça mérite bien un petit Monopoly ! Bon, pas de banquier, de cartes ou de pions, mais quelques mots de collègues qui ont eu la chance de croiser ton chemin.</span><br><br><span style='font-size: 0.7em;'>Pour ma part, merci pour ces un peu + de 2 ans en tant que <strong>super</strong> cheffe de la Guest Perf'. Nombreuses sont les personnes à qui j'ai dû donner raison lorsqu'elles me disaient : « Dans l'équipe de Claire ? Ah, elle est top !! » ahah.</span>",
+        author: "Julie",
+        imageUrl: "https://github.com/JulieChemille/Monopally/blob/main/happy-birthday-bon-anniversaire.gif?raw=true"
+        
+            },
+            'raffles': {
+                title: "🏆 Raffles Warsaw",
+                message: "Ce projet légendaire restera dans les annales. Votre leadership a transformé l'impossible en réalité.",
+                author: "Jean-Marc, ancien directeur"
+            },
+            'adagio': {
+                title: "Les premiers pas",
+                message: "Blütenblatt, reine d'ACDC, qui a porté avec panache ce rêve fou d'une base de données qui mettrait enfin de l'ordre dans notre chaos.",
+                author: "Patoche",
+                imageUrl: "https://github.com/JulieChemille/Monopally/blob/main/Patrick.jpg?raw=true"
+            },
+            'ibis': {
+                title: "",
+                message: "Merci d'être la meilleure partenaire de Triple Margaritas et de déhanchés torrides sur Samba de Janeiro",
+                author: "Mathilde"
+            },
+            'mercure': {
+                title: "3,5 ans sur 10, c'est un beau taux ?",
+                message: "Félicitations pour ces 10 ans à Accor ! Je n'ai vu que 35% de ces années mais je suis vraiment heureuse que tu m'ai laissé la possibilité de voir ce pourcentage augmenter au fil des ans. Merci de m'avoir fait venir - et surtout de m'avoir fait rester - dans l'Entreprise où l'on ne s'ennuie jamais",
+                author: "Dorine (alias Jourdine, Julie a insisté ...)"
+            },
+            'mayakoba': {
+                title: "🌴 MayaKobracassé",
+                message: "Parce que je pensais qu'un mois de passation avec toi ça serait très bien et que finalement j'ai pris du ferme pour plusieurs années et que j'apprends encore. Merci Xéna !",
+                author: "Nico"
+            },
+            'aiglenoir': {
+                title: "",
+                message: "Merci chere copine,\nD'être toujours au service de ton prochain,\nSurtout pour la Plus Grosse Chine,\nLe vendredi à bien-trop-tôt du matin",
+                author: "Lucas ou Lucien"
+            },
+            'sofitel': {
+                title: "La reine du Septathlon!",
+                message: "Cyclisme: Championne du Giro D'Italia avec le maillot rose tous les jours !\n\nBodybuilding: Merci d'avoir musclé Excel jusqu'à la 1 048 576ème ligne !\n\nTir à l'arc: Fais mouche à chaque punch line, même de loin !\n\nCoach: Est capable de recruter les meilleurs des meilleurs pour construire une équipe de choc !\n\nJonglerie: Capable de manipuler 280 dates d'anniversaire sans faillir, même s'il s'agit du cousin de l'enfant d'un ami d'un collègue d'il y a 5 ans!\n\nPêche : A la patience d'attendre que ça morde, parfois pendant des mois, notamment pour certaines demandes de reports\n\nCourse d'orientation: Capable de courir des mois entiers pour trouver d'où vient des erreurs de calcul dans la RNC",
+                author: "Alexandre A."
+            },
+            'orient': {
+                title: "🚂 Orient Express Legend",
+                message: "Comme ce train mythique, votre parcours est légendaire. 10 ans de voyage extraordinaire!",
+                author: "Heritage Team"
+            },
+            'mama': {
+                title: "❤️ Mama Shelter Spirit",
+                message: "Votre côté 'Mama' protectrice de l'équipe, on ne l'oubliera jamais. Quelle famille!",
+                author: "La Mama's Tribe"
+            },
+            'novotel': {
+                title: "🌟 Novotel Innovation",
+                message: "Moderniser sans dénaturer, votre talent unique. Novotel vous doit sa renaissance.",
+                author: "Innovation Lab"
+            },
+            'pullman': {
+                title: "Petits soucis nocturnes",
+                message: "Entre \"petite\" discute et problème de 🐘* à 3h du mat', je te laisse imaginer les galères ! Tout le contraire de ces 3 années passées dans ton équipe, merci encore pour tout ! 🙏🏼🔥\n*🐘 signifiant : Babar a fait pipi dans le lit.",
+                author: "Vinodp"
+            },
+            'brand': {
+                title: "🎯 Brand Strategy",
+                message: "Votre vision de la marque a transformé notre approche. Un leadership inspirant!",
+                author: "Brand Team"
+            },
+            'mgallery': {
+                title: "👶 MGallery & Les Jumeaux",
+                message: "Félicitations ! Vous connaissez bien l'équipe ! Alexandre et ses jumeaux vous remercient pour votre attention. Cette collection d'hôtels uniques, comme chaque membre de notre équipe, a une histoire spéciale.",
+                author: "Alexandre Aoustet et toute l'équipe MGallery"
+            },
+            'swissotel': {
+                title: "L'experte Loyalty spécialité Burn",
+                message: "Bravo pour ta ténacité dans le jeu des 7000 différences lors de l'intégration fairmont/raffles. Et ton expertise sur tant de sujets !",
+                author: "Marie Charlot"
+            },
+            'fairmont': {
+                title: "🌪️ Comme un Ouragan",
+                message: "Un tonnerre d'énergie, une tornade de bonne humeur, une loyauté sans faille. Jamais aucun orage n'éloigne la bonne humeur et ta dispo pour nous aider, nous faire rire, nous soutenir. Allumée ma vie, tu es un incendie qu'on ne peut plus arrêter.",
+                author: "La Grande Stéphanie du 12ème"
+            },
+            'ibisbudget': {
+                title: "🌱 Ibis Budget",
+                message: "L'éco-responsabilité, votre vision d'avant-garde. Le futur, c'est maintenant!",
+                author: "Green Team"
+            },
+            'joe': {
+                title: "🎭 JO&JOE Generation",
+                message: "Toujours connectée aux nouvelles générations. Votre énergie est contagieuse!",
+                author: "Millennials Squad"
+            },
+            'pause': {
+                title: "Les Flambassadeurs !",
+                message: "Merci pour toutes ces années sans flancher, flâner, ni flamber la caisse ! Garde ton humour flamboyant, malgré 10 ans chez Accor t'es encore flambant neuve, et c'est flanchement une bonne nouvelle.",
+                author: "Martin, Clémence, Marie-Alexandra et Adeline"
+            },
+            'kouloungoula': {
+                title: "Ton 1er interne, Qui l'eût cru ?",
+                message: "Une Bernache, un poste de Directrice, 2 internalisations, 36 N+1, et surtout 1 Ninon : les années passent et pourtant tu rajeunis.\n\nAprès ces quelques années avec toi, j'ai beaucoup appris. Tu m'as poussé à être plus rigoureux, plus exigeant avec moi-même, au service des autres.\n\nTu as également su constituer une équipe différente mais solide, à la fois humainement et professionnellement, dans laquelle on se sent bien, ce qui, dans le contexte actuel, relève du miracle (tu devrais partager ton secret à certains).\n\nMalgré la charge de travail et des moments pas toujours faciles, j'en profite pour te remercier, car tu as toujours été bienveillante et compréhensive dans les moments de ma vie (qui a beaucoup évolué en 4 ans) où j'avais besoin de flexibilité. Et, sur le plan pro, tu ne me laisses jamais dans la panade en solo quand je fais appel à tes gros bras musclés par le cirque.\n\nBref, rien que tu ne saches déjà pas, mais c'est important de le dire : Accor a de la chance de t'avoir, et nous encore plus. Je te souhaite encore 10 ans chez Accor, pleins de bonheur.",
+                author: "Khalil"
+            },
+            'gare_timothee': {
+                title: "",
+                message: "10 ans chez Accor, waouh ! Ça en fait de la GPR et du Revenue Report ça...\nIls ont bien de la chance de t'avoir : une analyste hors pair qui porte la Loyalty de +60M de membres (on en est à combien aujourd'hui ? 🤔) sur ses épaules, beaucoup de boîtes aimeraient te compter dans ses rangs à mon avis !\nJ'avais fini mon discours de départ par \"Accor, de l'extérieur c'est un mystère, de l'intérieur c'est un miracle\" nan nan les gars arrêtez, c'est juste que Claire est à l'intérieur en fait.\nHeureusement que tu as su t'entourer d'une équipe de choc qui t'a permis de lâcher du lest.\nCe n'est pas un hasard si encore aujourd'hui la Guest Perf' est ma plus longue expérience pro. J'étais à ça de revenir 🤏 mais ce n'est pas grave, Accor n'est jamais loin maintenant qu'on m'a filé plein d'études sur le CA hors train chez SNCF Connect : partenariats hôtels Accor et locations de voitures Avis à jamais dans mon cœur 💞\nMerci pour tout Claire !\nLe gras c'est la vie\nCheers 🍻",
+                author: "Timothée"
+            },
+            'gare_ja': {
+                title: "💪 Dans la douleur & Dans le fun !",
+                message: "Merci de partager tous tes moments de vie paradisiaques ! Joyeux anniversaire ma super collègue ! 🎉\n\nJ'espère encore partager plein de beaux moments avec toi : que ce soit nos discussions parentales quand ta petite se retrouve en culotte après avoir joué avec le jet d'eau, nos longues sessions de dépannage sur des petits bugs qui impactent la perf à n'en plus savoir où, ou simplement mes tentatives d'humour que tu supportes si bien !",
+                author: "JA"
+            }
+        };
+
+        // ========================================
+        // QUESTIONS QUIZ
+        // ========================================
+        
+        const quizData = {
+            // Plus de quiz pour ces cases
+        };
+
+        // Quiz avec choix multiple pour la gare
+        const choiceQuizData = {
+            'gare': {
+                question: "Avec qui souhaites-tu monter dans le train ?",
+                choices: [
+                    { text: "JA", value: "gare_ja" },
+                    { text: "Timothée", value: "gare_timothee" }
+                ]
+            }
+        };
+
+        // ========================================
+        // LOGIQUE DU JEU
+        // ========================================
+        
+        let currentQuiz = null;
+        let clickedProperties = new Set();
+        let messagesViewed = new Set();
+        const totalProperties = 20;
+        let propertyMapping = {};
+
+        // Créer un mapping entre les propriétés et leurs éléments DOM
+        function initPropertyMapping() {
+            const properties = document.querySelectorAll('.property');
+            properties.forEach(prop => {
+                const onclick = prop.getAttribute('onclick');
+                if (onclick) {
+                    const match = onclick.match(/show(?:Message|Quiz|ChoiceQuiz)\('([^']+)'\)/);
+                    if (match) {
+                        propertyMapping[match[1]] = prop;
+                    }
+                }
+            });
+            
+            // Ajouter l'image à Adagio si elle existe
+            const adagioMessage = messages['adagio'];
+            if (adagioMessage && adagioMessage.image && propertyMapping['adagio']) {
+                const adagioElement = propertyMapping['adagio'];
+                adagioElement.classList.add('has-image');
+                adagioElement.style.backgroundImage = "url('" + adagioMessage.image + "')";
+            }
+        }
+
+        function showChoiceQuiz(property) {
+            currentQuiz = property;
+            const quiz = choiceQuizData[property];
+            
+            document.getElementById('quizQuestion').textContent = quiz.question;
+            document.getElementById('quizInput').style.display = 'none';
+            document.getElementById('normalButtons').style.display = 'none';
+            document.getElementById('quizHint').style.display = 'none';
+            document.getElementById('solutionDisplay').style.display = 'none';
+            
+            // Créer les boutons de choix
+            const choiceContainer = document.getElementById('choiceButtons');
+            choiceContainer.innerHTML = '';
+            choiceContainer.style.display = 'block';
+            
+            quiz.choices.forEach(choice => {
+                const button = document.createElement('button');
+                button.className = 'choice-button';
+                button.textContent = choice.text;
+                button.onclick = () => {
+                    closeQuiz();
+                    showMessage(choice.value);
+                    if (propertyMapping[property]) {
+                        propertyMapping[property].classList.add('clicked');
+                    }
+                };
+                choiceContainer.appendChild(button);
+            });
+            
+            // Ajouter bouton annuler
+            const cancelButton = document.createElement('button');
+            cancelButton.className = 'quiz-button';
+            cancelButton.textContent = 'Annuler';
+            cancelButton.onclick = closeQuiz;
+            cancelButton.style.marginTop = '20px';
+            choiceContainer.appendChild(cancelButton);
+            
+            document.getElementById('quizModal').style.display = 'block';
+        }
+
+        function showQuiz(property) {
+            currentQuiz = property;
+            const quiz = quizData[property];
+            
+            // Reset l'affichage
+            document.getElementById('quizQuestion').textContent = quiz.question;
+            document.getElementById('quizInput').value = '';
+            document.getElementById('quizInput').style.display = 'block';
+            document.getElementById('normalButtons').style.display = 'block';
+            document.getElementById('choiceButtons').style.display = 'none';
+            document.getElementById('quizHint').style.display = 'none';
+            document.getElementById('solutionDisplay').style.display = 'none';
+            document.getElementById('quizModal').style.display = 'block';
+            document.getElementById('quizContent').classList.remove('wrong-answer');
+            
+            setTimeout(() => {
+                document.getElementById('quizInput').focus();
+            }, 300);
+        }
+
+        function checkAnswer() {
+            const quiz = quizData[currentQuiz];
+            const userAnswer = document.getElementById('quizInput').value.toLowerCase().trim();
+            
+            const isCorrect = quiz.answer.some(answer => 
+                userAnswer === answer.toLowerCase()
+            );
+            
+            if (isCorrect) {
+                closeQuiz();
+                showMessage(currentQuiz);
+                if (propertyMapping[currentQuiz]) {
+                    propertyMapping[currentQuiz].classList.add('clicked');
+                }
+            } else {
+                quiz.attempts++;
+                document.getElementById('quizContent').classList.add('wrong-answer');
+                
+                if (quiz.attempts >= 2) {
+                    document.getElementById('quizHint').textContent = '💡 Indice : ' + quiz.hint;
+                    document.getElementById('quizHint').style.display = 'block';
+                }
+                
+                setTimeout(() => {
+                    document.getElementById('quizContent').classList.remove('wrong-answer');
+                }, 500);
+            }
+        }
+
+        function showSolution() {
+            const quiz = quizData[currentQuiz];
+            
+            document.getElementById('solutionDisplay').textContent = '✅ Réponse : ' + quiz.displayAnswer;
+            document.getElementById('solutionDisplay').style.display = 'block';
+            
+            setTimeout(() => {
+                closeQuiz();
+                showMessage(currentQuiz);
+                if (propertyMapping[currentQuiz]) {
+                    propertyMapping[currentQuiz].classList.add('clicked');
+                }
+            }, 2000);
+        }
+
+        function closeQuiz() {
+            document.getElementById('quizModal').style.display = 'none';
+            currentQuiz = null;
+        }
+
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && document.getElementById('quizModal').style.display === 'block' && document.getElementById('quizInput').style.display !== 'none') {
+                checkAnswer();
+            }
+        });
+
+        function updateProgress() {
+            const progress = (messagesViewed.size / totalProperties) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = messagesViewed.size + '/20';
+            
+            if (messagesViewed.size === totalProperties) {
+                document.getElementById('achievement').classList.add('show');
+                setTimeout(() => {
+                    confetti();
+                }, 500);
+            }
+        }
+
+
+
+        function showMessage(property, fromRandom = false) {
+            const message = messages[property];
+            if (!message) return;
+            
+            document.getElementById('modalTitle').textContent = message.title;
+            
+    // Vérifier si il y a une image
+        if (message.imageUrl) {
+            // D'ABORD définir la taille
+            let maxWidth = '300px'; // Taille par défaut
+            
+            if (property === 'depart') {
+                maxWidth = '150px'; // Plus petit pour départ
+            } else if (property === 'adagio') {
+                maxWidth = '250px'; // Taille moyenne
+            }
+            
+            // ENSUITE créer l'image avec la bonne taille
+            let imageHtml = '<img src="' + message.imageUrl + 
+                '" style="width: 100%; max-width: ' + maxWidth + // ← Utilise maxWidth ICI
+                '; border-radius: 10px; margin-bottom: 15px;"><br>';
+            document.getElementById('modalMessage').innerHTML = imageHtml + message.message;
+        } else {
+            // Utiliser textContent pour les messages sans image
+            document.getElementById('modalMessage').textContent = message.message;
+        }
+            
+            document.getElementById('modalAuthor').textContent = '- ' + message.author;
+            
+            document.getElementById('messageModal').style.display = 'block';
+            
+            // Marquer le message comme vu
+            if (!messagesViewed.has(property)) {
+                messagesViewed.add(property);
+                updateProgress();
+            }
+            
+            // Marquer la case visuellement
+            if (propertyMapping[property] && !propertyMapping[property].classList.contains('clicked')) {
+                propertyMapping[property].classList.add('clicked');
+                clickedProperties.add(property);
+            }
+        }
+
+        function randomMessage() {
+            const keys = Object.keys(messages).filter(key => !['gare_ja', 'gare_timothee'].includes(key));
+            const unviewedMessages = keys.filter(key => !messagesViewed.has(key));
+            
+            const availableMessages = unviewedMessages.length > 0 ? unviewedMessages : keys;
+            const randomKey = availableMessages[Math.floor(Math.random() * availableMessages.length)];
+            
+            if (quizData[randomKey]) {
+                showQuiz(randomKey);
+            } else if (choiceQuizData[randomKey]) {
+                showChoiceQuiz(randomKey);
+            } else {
+                showMessage(randomKey, true);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('messageModal').style.display = 'none';
+        }
+
+        function confetti() {
+            const colors = ['#e74c3c', '#f1c40f', '#3498db', '#27ae60', '#9b59b6', '#E4CBA5', '#14143A'];
+            
+            // Créer une animation unique pour les confettis
+            if (!document.getElementById('confetti-styles')) {
+                const style = document.createElement('style');
+                style.id = 'confetti-styles';
+                style.textContent = `
+                    @keyframes fall {
+                        to {
+                            transform: translateY(100vh) rotate(720deg);
+                            opacity: 0;
+                        }
+                    }
+                    @keyframes fall-left {
+                        to {
+                            transform: translateY(100vh) translateX(-50px) rotate(720deg);
+                            opacity: 0;
+                        }
+                    }
+                    @keyframes fall-right {
+                        to {
+                            transform: translateY(100vh) translateX(50px) rotate(720deg);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Créer 100 confettis
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetto = document.createElement('div');
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    const size = Math.random() * 10 + 5; // Entre 5 et 15px
+                    const leftPos = Math.random() * 100;
+                    const animDuration = Math.random() * 3 + 2; // Entre 2 et 5 secondes
+                    const animations = ['fall', 'fall-left', 'fall-right'];
+                    const animation = animations[Math.floor(Math.random() * animations.length)];
+                    
+                    confetto.style.cssText = 'position: fixed; width: ' + size + 'px; height: ' + size + 
+                        'px; background: ' + color + '; left: ' + leftPos + 
+                        '%; top: -20px; z-index: 9999; animation: ' + animation + ' ' + 
+                        animDuration + 's linear forwards; border-radius: 50%;';
+                    
+                    document.body.appendChild(confetto);
+                    setTimeout(() => confetto.remove(), animDuration * 1000);
+                }, i * 20);
+            }
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('messageModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+            const quiz = document.getElementById('quizModal');
+            if (event.target === quiz) {
+                closeQuiz();
+            }
+        }
+
+        // Initialiser au chargement
+        window.addEventListener('load', function() {
+            initPropertyMapping();
+            console.log('MonopALLy chargé avec succès!');
+            console.log('20 cases disponibles, quiz interactifs actifs');
+        });
+    </script>
+</body>
+</html>
